@@ -22,7 +22,8 @@ import {
     Play,
     Pause,
     VolumeX,
-    Gift
+    Gift,
+    ArrowLeft
 } from 'lucide-react';
 
 // Support Email
@@ -630,28 +631,72 @@ function Bonus3Screen() {
 }
 
 function Bonus4Screen() {
-    return (
-        <div className="animate-in fade-in duration-500 flex flex-col h-full space-y-12 pb-10">
-            <div>
-                <div className="mb-5 flex-shrink-0">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Protocolo Nocturno Da Vinci</h1>
-                    <p className="text-[#C9A84C] font-light">Recupera tus Noches, Recupera tu Paz</p>
+    const [selectedMaterial, setSelectedMaterial] = useState(null);
+
+    const materials = [
+        {
+            id: 'nocturno',
+            title: 'Protocolo Nocturno Da Vinci',
+            subtitle: 'Recupera tus Noches, Recupera tu Paz',
+            src: 'https://gamma.app/embed/mavpu152zuts30r'
+        },
+        {
+            id: 'plasticidad',
+            title: 'Acelerador de Plasticidad Gamma',
+            subtitle: 'Expande tu mente',
+            src: 'https://gamma.app/embed/47p2vhs3ih4i09p'
+        }
+    ];
+
+    if (selectedMaterial) {
+        return (
+            <div className="animate-in fade-in duration-500 flex flex-col h-full space-y-6 pb-10">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">{selectedMaterial.title}</h1>
+                        <p className="text-[#C9A84C] font-light">{selectedMaterial.subtitle}</p>
+                    </div>
+                    <button 
+                        onClick={() => setSelectedMaterial(null)}
+                        className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-4 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 font-medium"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Volver
+                    </button>
                 </div>
                 <GammaViewer
-                    src="https://gamma.app/embed/mavpu152zuts30r"
-                    title="Protocolo Nocturno Da Vinci: Recupera tus Noches, Recupera tu Paz"
+                    src={selectedMaterial.src}
+                    title={selectedMaterial.title}
                 />
             </div>
-            
-            <div>
-                <div className="mb-5 flex-shrink-0">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Acelerador de Plasticidad Gamma</h1>
-                    <p className="text-[#C9A84C] font-light">Expande tu mente</p>
-                </div>
-                <GammaViewer
-                    src="https://gamma.app/embed/47p2vhs3ih4i09p"
-                    title="Acelerador de Plasticidad Gamma"
-                />
+        );
+    }
+
+    return (
+        <div className="animate-in fade-in duration-500">
+            <div className="mb-8 border-b border-white/10 pb-6">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Bonus Extras</h1>
+                <p className="text-xl text-[#C9A84C] font-light">Material exclusivo para potenciar tus resultados</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {materials.map((material) => (
+                    <div key={material.id} className="bg-[#121214]/80 backdrop-blur-xl border border-white/10 hover:border-[#C9A84C]/50 rounded-3xl p-6 sm:p-8 shadow-[0_15px_40px_rgba(0,0,0,0.3)] transition-all duration-300 group flex flex-col h-full hover:-translate-y-1">
+                        <div className="w-14 h-14 bg-gradient-to-br from-[#C9A84C]/20 to-transparent rounded-2xl flex items-center justify-center mb-6 border border-[#C9A84C]/20 text-[#C9A84C] group-hover:scale-110 transition-transform duration-300 shadow-[0_0_15px_rgba(201,168,76,0.1)]">
+                            <Gift className="w-7 h-7" />
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-wide">{material.title}</h3>
+                        <p className="text-zinc-400 text-base mb-8 flex-grow leading-relaxed">{material.subtitle}</p>
+                        
+                        <button 
+                            onClick={() => setSelectedMaterial(material)}
+                            className="w-full bg-gradient-to-r from-[#C9A84C] to-[#b49339] hover:from-[#e5ca76] hover:to-[#C9A84C] text-black font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(201,168,76,0.3)] hover:shadow-[0_0_20px_rgba(201,168,76,0.5)] group-hover:bg-[#e5ca76]"
+                        >
+                            <ExternalLink className="w-5 h-5 mr-2" />
+                            Visualizar Material
+                        </button>
+                    </div>
+                ))}
             </div>
         </div>
     );
