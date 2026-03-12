@@ -21,7 +21,8 @@ import {
     ExternalLink,
     Play,
     Pause,
-    VolumeX
+    VolumeX,
+    Gift
 } from 'lucide-react';
 
 // Support Email
@@ -165,6 +166,7 @@ function DashboardLayout({ children }) {
         { path: '/bonus-1', icon: Brain, label: 'Eliminador de Niebla Mental' },
         { path: '/bonus-2', icon: Salad, label: 'Guía de Alimentos' },
         { path: '/bonus-3', icon: LifeBuoy, label: 'Protocolo de Emergencia' },
+        { path: '/bonus-4', icon: Gift, label: 'Bonus Extras' },
         { path: '/cuenta', icon: User, label: 'Mi Cuenta' },
     ];
 
@@ -627,6 +629,34 @@ function Bonus3Screen() {
     );
 }
 
+function Bonus4Screen() {
+    return (
+        <div className="animate-in fade-in duration-500 flex flex-col h-full space-y-12 pb-10">
+            <div>
+                <div className="mb-5 flex-shrink-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Protocolo Nocturno Da Vinci</h1>
+                    <p className="text-[#C9A84C] font-light">Recupera tus Noches, Recupera tu Paz</p>
+                </div>
+                <GammaViewer
+                    src="https://gamma.app/embed/mavpu152zuts30r"
+                    title="Protocolo Nocturno Da Vinci: Recupera tus Noches, Recupera tu Paz"
+                />
+            </div>
+            
+            <div>
+                <div className="mb-5 flex-shrink-0">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-white mb-1">Acelerador de Plasticidad Gamma</h1>
+                    <p className="text-[#C9A84C] font-light">Expande tu mente</p>
+                </div>
+                <GammaViewer
+                    src="https://gamma.app/embed/47p2vhs3ih4i09p"
+                    title="Acelerador de Plasticidad Gamma"
+                />
+            </div>
+        </div>
+    );
+}
+
 function ProfileScreen() {
     const { user, logout } = React.useContext(AuthContext);
 
@@ -699,6 +729,7 @@ function App() {
                     <Route path="/bonus-1" element={<ProtectedRoute><Bonus1Screen /></ProtectedRoute>} />
                     <Route path="/bonus-2" element={<ProtectedRoute><Bonus2Screen /></ProtectedRoute>} />
                     <Route path="/bonus-3" element={<ProtectedRoute><Bonus3Screen /></ProtectedRoute>} />
+                    <Route path="/bonus-4" element={<ProtectedRoute><Bonus4Screen /></ProtectedRoute>} />
                     <Route path="/cuenta" element={<ProtectedRoute><ProfileScreen /></ProtectedRoute>} />
 
                     {/* Fallback */}

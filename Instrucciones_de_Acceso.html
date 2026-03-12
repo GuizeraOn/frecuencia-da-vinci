@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instrucciones de Acceso - Frecuencia Da Vinci</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos generales y configuración estricta para tamaño A4 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f4f5;
+            display: flex;
+            justify-content: center;
+            font-family: 'Inter', sans-serif;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Contenedor tamaño A4 exacto */
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            background-color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            color: #27272a;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+        }
+
+        /* Configuración de impresión */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+
+            html,
+            body {
+                width: 210mm;
+                height: 297mm;
+                margin: 0 !important;
+                padding: 0 !important;
+                background-color: #ffffff;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .a4-page {
+                box-shadow: none !important;
+                width: 100% !important;
+                height: 100% !important;
+                margin: 0 !important;
+                page-break-after: avoid;
+                page-break-before: avoid;
+                overflow: hidden !important;
+            }
+        }
+
+        /* Elementos Decorativos */
+        .header-accent {
+            background: linear-gradient(135deg, #18181b 0%, #0D0D0D 100%);
+            height: 48px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-bottom: 4px solid #C9A84C;
+        }
+
+        .background-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.03;
+            width: 400px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Contenido Principal */
+        .content {
+            position: relative;
+            z-index: 10;
+            padding: 70px 60px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-title {
+            text-align: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        .brand-title h1 {
+            font-size: 32px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #18181b;
+        }
+
+        .brand-title h1 span {
+            color: #C9A84C;
+            font-weight: 700;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .welcome-text h2 {
+            font-size: 24px;
+            color: #18181b;
+            margin-bottom: 12px;
+        }
+
+        .welcome-text p {
+            font-size: 16px;
+            color: #52525b;
+            line-height: 1.6;
+            MAX-WIDTH: 550PX;
+            MARGIN: 0 AUTO;
+        }
+
+        /* Pasos */
+        .steps-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .step-card {
+            background-color: #fafafa;
+            border: 1px solid #e4e4e7;
+            border-left: 4px solid #C9A84C;
+            border-radius: 8px;
+            padding: 24px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        .step-number {
+            background-color: #18181b;
+            color: #C9A84C;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 18px;
+            color: #18181b;
+            margin-bottom: 8px;
+            margin-top: 6px;
+        }
+
+        .step-content p {
+            font-size: 15px;
+            color: #52525b;
+            line-height: 1.6;
+        }
+
+        .link-box {
+            display: inline-block;
+            background-color: #18181b;
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 12px;
+            border: 1px solid #3f3f46;
+        }
+
+        .link-box span {
+            color: #C9A84C;
+        }
+
+        .email-highlight {
+            font-weight: 600;
+            color: #18181b;
+            background-color: #f4f4f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Footer / Soporte */
+        .footer-support {
+            margin-top: auto;
+            background-color: #18181b;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            color: #e4e4e7;
+        }
+
+        .footer-support p {
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .footer-support .support-email {
+            display: inline-block;
+            color: #C9A84C;
+            font-weight: 600;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .bottom-note {
+            text-align: center;
+            font-size: 12px;
+            color: #a1a1aa;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="a4-page">
+        <!-- Decoración superior -->
+        <div class="header-accent"></div>
+
+        <!-- Marca de agua de fondo (Icono de ondas SVG) -->
+        <svg class="background-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000000"
+            stroke-width="0.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 10v3"></path>
+            <path d="M6 6v11"></path>
+            <path d="M10 3v18"></path>
+            <path d="M14 8v7"></path>
+            <path d="M18 5v13"></path>
+            <path d="M22 10v3"></path>
+        </svg>
+
+        <div class="content">
+            <!-- Título del Producto -->
+            <div class="brand-title">
+                <h1>Frecuencia <span>Da Vinci</span></h1>
+            </div>
+
+            <!-- Bienvenida -->
+            <div class="welcome-text">
+                <h2>¡Felicidades y Bienvenido/a!</h2>
+                <p>Estás a un paso de comenzar tu transformación. Sigue estas sencillas instrucciones para entrar a la
+                    plataforma y acceder a tu protocolo de audio y todos tus bonos gratuitos.</p>
+            </div>
+
+            <!-- Instrucciones -->
+            <div class="steps-container">
+                <!-- Paso 1 -->
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Entra a la Plataforma</h3>
+                        <p>Abre el navegador de internet en tu teléfono celular, tableta o computadora (como Google
+                            Chrome o Safari) y escribe la siguiente dirección web, o bien, haz clic en el botón de
+                            abajo:</p>
+                        <a href="https://frecuencia-da-vinci.vercel.app" class="link-box" target="_blank">
+                            frecuencia-da-vinci.<span>vercel.app</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Paso 2 -->
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Inicia Sesión con tu Correo</h3>
+                        <p>Una vez dentro de la página, el sistema te pedirá un correo para entrar. <strong>Es muy
+                                importante</strong> que escribas <span class="email-highlight">exactamente el mismo
+                                correo electrónico</span> que usaste para realizar la compra hoy.</p>
+                        <p style="margin-top: 8px; font-size: 13px; color: #71717a;"><em>Nota: No necesitas recordar
+                                ninguna contraseña complicada. Nuestro sistema reconocerá tu correo de forma automática
+                                y segura.</em></p>
+                    </div>
+                </div>
+
+                <!-- Paso 3 -->
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Disfruta tu Experiencia</h3>
+                        <p>¡Listo! Estarás dentro de tu área privada. Busca un lugar tranquilo, conecta tus audífonos, y
+                            sigue las instrucciones en la pantalla para comenzar a escuchar tu protocolo por primera
+                            vez.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Soporte -->
+            <div class="footer-support">
+                <p><strong>¿El sistema no te deja entrar o escribiste mal tu correo?</strong></p>
+                <p>No te preocupes. Si tienes cualquier dificultad para acceder o alguna pregunta táctica, nuestro
+                    equipo está siempre dispuesto a ayudarte de inmediato. Simplemente escríbenos a:</p>
+                <span class="support-email">soporte@frecuenciadavinci.com</span>
+            </div>
+
+            <p class="bottom-note">Te recomendamos guardar este archivo PDF en tu teléfono o computadora para que
+                siempre recuerdes cómo ingresar.</p>
+        </div>
+    </div>
+
+</body>
+
+</html>
