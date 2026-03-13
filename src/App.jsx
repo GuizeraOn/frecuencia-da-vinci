@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
+    Activity,
     AudioLines,
     Music,
     Brain,
@@ -164,6 +165,7 @@ function DashboardLayout({ children }) {
 
     const navItems = [
         { path: '/', icon: Music, label: 'Protocolo Principal' },
+        { path: '/reset-nervio', icon: Activity, label: 'Reset del Nervio Auditivo' },
         { path: '/bonus-1', icon: Brain, label: 'Eliminador de Niebla Mental' },
         { path: '/bonus-2', icon: Salad, label: 'Guía de Alimentos' },
         { path: '/bonus-3', icon: LifeBuoy, label: 'Protocolo de Emergencia' },
@@ -702,6 +704,125 @@ function Bonus4Screen() {
     );
 }
 
+function ResetNervioScreen() {
+    const [expandedItem, setExpandedItem] = useState(null);
+
+    const toggleItem = (id) => {
+        if (expandedItem === id) {
+            setExpandedItem(null);
+        } else {
+            setExpandedItem(id);
+        }
+    };
+
+    const protocoloItems = [
+        {
+            id: 'shot',
+            title: 'Shot Matinal del Nervio',
+            subtitle: 'Preparación de 30 segundos · reduce inflamación antes de cada sesión',
+            src: 'https://gamma.app/embed/s6isa9j6yns3a63'
+        },
+        {
+            id: 'drenaje',
+            title: 'Protocolo de Drenaje Nocturno',
+            subtitle: 'Rutina de 3 minutos · potencia el drenaje linfático cerebral durante el sueño',
+            src: 'https://gamma.app/embed/06bojv8l68i0376'
+        },
+        {
+            id: 'amplificadores',
+            title: 'Guía de Amplificadores Naturales',
+            subtitle: '5 alimentos que amplifican la señal gamma · 5 que la bloquean sin que lo sepas',
+            src: 'https://gamma.app/embed/xsp8q32io5ipmtf'
+        }
+    ];
+
+    const bonosItems = [
+        {
+            id: 'durmiente',
+            tag: 'Bono 1',
+            title: 'El Durmiente Profundo',
+            subtitle: 'Audio de 8 minutos · lleva tu sistema nervioso del alerta del tinnitus al sueño delta profundo',
+            src: 'https://gamma.app/embed/xtryl475on64b0s'
+        },
+        {
+            id: 'reconectados',
+            tag: 'Bono 2',
+            title: 'Reconectados',
+            subtitle: 'Guía de 4 semanas · reconstruye la comunicación y la intimidad que el zumbido fue erosionando',
+            src: 'https://gamma.app/embed/863iofapbcvm88p'
+        }
+    ];
+
+    const renderCard = (item, isBono) => {
+        const isExpanded = expandedItem === item.id;
+        
+        return (
+            <div key={item.id} className={`bg-[#121214]/80 backdrop-blur-xl border border-white/10 ${isExpanded ? 'border-[#C9A84C]/50 shadow-[0_15px_40px_rgba(201,168,76,0.15)]' : 'hover:border-[#C9A84C]/30 shadow-[0_15px_40px_rgba(0,0,0,0.3)]'} rounded-3xl p-6 sm:p-8 transition-all duration-300 group flex flex-col h-full overflow-hidden`}>
+                {isBono && (
+                    <div className="bg-[#C9A84C]/10 text-[#C9A84C] text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 inline-block w-max border border-[#C9A84C]/20 shadow-[0_0_10px_rgba(201,168,76,0.05)]">
+                        {item.tag}
+                    </div>
+                )}
+                
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-wide">{item.title}</h3>
+                <p className="text-zinc-400 text-base mb-8 flex-grow leading-relaxed">{item.subtitle}</p>
+                
+                <button 
+                    onClick={() => toggleItem(item.id)}
+                    className="w-full bg-gradient-to-r from-[#C9A84C] to-[#b49339] hover:from-[#e5ca76] hover:to-[#C9A84C] text-black font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(201,168,76,0.3)] hover:shadow-[0_0_20px_rgba(201,168,76,0.5)] group-hover:scale-[1.01]"
+                >
+                    {isExpanded ? (
+                        <>
+                            <Minimize className="w-5 h-5 mr-2" />
+                            Ocultar Contenido
+                        </>
+                    ) : (
+                        <>
+                            <Maximize className="w-5 h-5 mr-2" />
+                            Ver Contenido
+                        </>
+                    )}
+                </button>
+
+                {isExpanded && (
+                    <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <GammaViewer src={item.src} title={item.title} />
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="animate-in fade-in duration-500">
+            <div className="mb-10 border-b border-white/10 pb-6">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Reset del Nervio Auditivo</h1>
+                <p className="text-xl text-[#C9A84C] font-light">Tu protocolo completo de desinflamación auditiva</p>
+            </div>
+
+            <div className="mb-12">
+                <div className="flex items-center mb-6">
+                    <Activity className="w-6 h-6 text-[#C9A84C] mr-3" />
+                    <h2 className="text-2xl font-semibold text-white">Protocolo</h2>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                    {protocoloItems.map(item => renderCard(item, false))}
+                </div>
+            </div>
+
+            <div>
+                <div className="flex items-center mb-6">
+                    <Gift className="w-6 h-6 text-zinc-400 mr-3" />
+                    <h2 className="text-2xl font-semibold text-white">Bonos</h2>
+                </div>
+                <div className="grid grid-cols-1 gap-6">
+                    {bonosItems.map(item => renderCard(item, true))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function ProfileScreen() {
     const { user, logout } = React.useContext(AuthContext);
 
@@ -771,6 +892,7 @@ function App() {
 
                     {/* Protected Routes inside Dashboard */}
                     <Route path="/" element={<ProtectedRoute><ProtocoloPrincipal /></ProtectedRoute>} />
+                    <Route path="/reset-nervio" element={<ProtectedRoute><ResetNervioScreen /></ProtectedRoute>} />
                     <Route path="/bonus-1" element={<ProtectedRoute><Bonus1Screen /></ProtectedRoute>} />
                     <Route path="/bonus-2" element={<ProtectedRoute><Bonus2Screen /></ProtectedRoute>} />
                     <Route path="/bonus-3" element={<ProtectedRoute><Bonus3Screen /></ProtectedRoute>} />
