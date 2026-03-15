@@ -253,7 +253,7 @@ function DashboardLayout({ children }) {
 
 // --- DASHBOARD PAGES --- //
 
-function CustomAudioPlayer({ src, title }) {
+function CustomAudioPlayer({ src, title, customDuration }) {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [progress, setProgress] = useState(0);
@@ -297,7 +297,7 @@ function CustomAudioPlayer({ src, title }) {
 
     const handleLoadedMetadata = () => {
         if (audioRef.current) {
-            setDuration(formatTime(audioRef.current.duration));
+            setDuration(customDuration || formatTime(audioRef.current.duration));
         }
     };
 
@@ -398,6 +398,7 @@ function ProtocoloPrincipal() {
             <CustomAudioPlayer
                 src="/protocolo.mp3"
                 title="Frecuencia Da Vinci"
+                customDuration="7:00"
             />
 
             {/* Instructions */}
