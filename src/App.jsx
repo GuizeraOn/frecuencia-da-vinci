@@ -26,6 +26,7 @@ import {
     Gift,
     ArrowLeft
 } from 'lucide-react';
+import PWAOnboarding from './components/PWAOnboarding';
 
 // Support Email
 const SUPPORT_EMAIL = "soporte@frecuenciadavinci.com";
@@ -873,7 +874,12 @@ const ProtectedRoute = ({ children }) => {
     if (!user) {
         return <Navigate to="/login" replace />;
     }
-    return <DashboardLayout>{children}</DashboardLayout>;
+    return (
+        <>
+            <PWAOnboarding />
+            <DashboardLayout>{children}</DashboardLayout>
+        </>
+    );
 };
 
 function App() {
