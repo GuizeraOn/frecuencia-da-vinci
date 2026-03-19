@@ -24,7 +24,8 @@ import {
     Pause,
     VolumeX,
     Gift,
-    ArrowLeft
+    ArrowLeft,
+    Lightbulb
 } from 'lucide-react';
 import PWAOnboarding from './components/PWAOnboarding';
 
@@ -167,6 +168,7 @@ function DashboardLayout({ children }) {
     const navItems = [
         { path: '/', icon: Music, label: 'Protocolo Principal' },
         { path: '/reset-nervio', icon: Activity, label: 'Reset del Nervio Auditivo' },
+        { path: '/reconstruccion-cognitiva', icon: Lightbulb, label: 'Reconstrucción Cognitiva' },
         { path: '/bonus-1', icon: Brain, label: 'Eliminador de Niebla Mental' },
         { path: '/bonus-2', icon: Salad, label: 'Guía de Alimentos' },
         { path: '/bonus-3', icon: LifeBuoy, label: 'Protocolo de Emergencia' },
@@ -825,6 +827,94 @@ function ResetNervioScreen() {
     );
 }
 
+function ReconstruccionCognitivaScreen() {
+    const [expandedItem, setExpandedItem] = useState(null);
+
+    const toggleItem = (id) => {
+        if (expandedItem === id) {
+            setExpandedItem(null);
+        } else {
+            setExpandedItem(id);
+        }
+    };
+
+    const items = [
+        {
+            id: 'item1',
+            title: 'Reconstrucción Cognitiva',
+            subtitle: 'Material interactivo sobre Reconstrucción Cognitiva y salud',
+            src: 'https://gamma.app/embed/igcrhz2zyxr65ni'
+        },
+        {
+            id: 'item2',
+            title: 'Batido de Reinicio Neuronal: ¡Despierta tu Cerebro!',
+            subtitle: 'Receta paso a paso para nutrir tu sistema nervioso y potenciar la claridad mental',
+            src: 'https://gamma.app/embed/8jmvi6u0pw4chxa'
+        },
+        {
+            id: 'item3',
+            title: 'Recuperación del Nervio Vago: Una Guía para Reducir el Tinnitus y el Malestar',
+            subtitle: 'Ejercicios y técnicas para estimular el nervio vago y promover la relajación profunda',
+            src: 'https://gamma.app/embed/splmjux6a4vyblp'
+        },
+        {
+            id: 'item4',
+            title: 'El Secreto de la Salud Intestinal y la Claridad Mental',
+            subtitle: 'Descubre la conexión entre tu intestino y tu cerebro, y cómo optimizarla',
+            src: 'https://gamma.app/embed/0yyesbuhkqs2ewf'
+        }
+    ];
+
+    const renderCard = (item) => {
+        const isExpanded = expandedItem === item.id;
+        
+        return (
+            <div key={item.id} className={`bg-[#121214]/80 backdrop-blur-xl border border-white/10 ${isExpanded ? 'border-[#C9A84C]/50 shadow-[0_15px_40px_rgba(201,168,76,0.15)]' : 'hover:border-[#C9A84C]/30 shadow-[0_15px_40px_rgba(0,0,0,0.3)]'} rounded-3xl p-6 sm:p-8 transition-all duration-300 group flex flex-col h-full overflow-hidden`}>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-wide">{item.title}</h3>
+                <p className="text-zinc-400 text-base mb-8 flex-grow leading-relaxed">{item.subtitle}</p>
+                
+                <button 
+                    onClick={() => toggleItem(item.id)}
+                    className="w-full bg-gradient-to-r from-[#C9A84C] to-[#b49339] hover:from-[#e5ca76] hover:to-[#C9A84C] text-black font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(201,168,76,0.3)] hover:shadow-[0_0_20px_rgba(201,168,76,0.5)] group-hover:scale-[1.01]"
+                >
+                    {isExpanded ? (
+                        <>
+                            <Minimize className="w-5 h-5 mr-2" />
+                            Ocultar Contenido
+                        </>
+                    ) : (
+                        <>
+                            <Maximize className="w-5 h-5 mr-2" />
+                            Ver Contenido
+                        </>
+                    )}
+                </button>
+
+                {isExpanded && (
+                    <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <GammaViewer src={item.src} title={item.title} />
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="animate-in fade-in duration-500">
+            <div className="mb-10 border-b border-white/10 pb-6">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-2 tracking-tight">Reconstrucción Cognitiva</h1>
+                <p className="text-xl text-[#C9A84C] font-light">Material integral para potenciar tu salud mental y física</p>
+            </div>
+
+            <div className="mb-12">
+                <div className="grid grid-cols-1 gap-6">
+                    {items.map(item => renderCard(item))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
 function ProfileScreen() {
     const { user, logout } = React.useContext(AuthContext);
 
@@ -899,6 +989,7 @@ function App() {
 
                     {/* Protected Routes inside Dashboard */}
                     <Route path="/" element={<ProtectedRoute><ProtocoloPrincipal /></ProtectedRoute>} />
+                    <Route path="/reconstruccion-cognitiva" element={<ProtectedRoute><ReconstruccionCognitivaScreen /></ProtectedRoute>} />
                     <Route path="/reset-nervio" element={<ProtectedRoute><ResetNervioScreen /></ProtectedRoute>} />
                     <Route path="/bonus-1" element={<ProtectedRoute><Bonus1Screen /></ProtectedRoute>} />
                     <Route path="/bonus-2" element={<ProtectedRoute><Bonus2Screen /></ProtectedRoute>} />
