@@ -530,10 +530,16 @@ function HomeScreen() {
                         desc="Nutrición auditiva" 
                     />
                     <ModuleCard 
-                        to="/botin-digital" 
+                        to="/bonus-3" 
+                        icon={LifeBuoy} 
+                        title="Emergencia" 
+                        desc="Protocolo de alivio rápido" 
+                    />
+                    <ModuleCard 
+                        to="/bonus-4" 
                         icon={Gift} 
-                        title="Bonus Extras" 
-                        desc="Botín digital completo" 
+                        title="Bonus Premium" 
+                        desc="Material exclusivo adicional" 
                     />
                 </div>
             </section>
