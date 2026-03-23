@@ -42,6 +42,17 @@ import PWAOnboarding from './components/PWAOnboarding';
 // Support Email
 const SUPPORT_EMAIL = "soporte@frecuenciadavinci.com";
 
+// Helper for progress tracking
+const markAsComplete = (id) => {
+    const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+    if (!completed.includes(id)) {
+        const updated = [...completed, id];
+        localStorage.setItem('completed_modules', JSON.stringify(updated));
+        // Dispatch event for other components to update
+        window.dispatchEvent(new Event('storage'));
+    }
+};
+
 // --- HELPERS ---
 const Separator = () => (
     <div className="flex items-center justify-center py-10 opacity-30">
