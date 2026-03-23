@@ -99,14 +99,45 @@ const SplashScreen = ({ onComplete }) => {
     );
 };
 
-// --- AUTH CONTEXT & PROVIDER ---
+// --- AUTH & PWA CONTEXTS ---
 export const AuthContext = React.createContext();
+export const PwaContext = React.createContext();
 
-function AuthProvider({ children }) {
+function CombinedProviders({ children }) {
     const [user, setUser] = useState(() => {
         const savedEmail = localStorage.getItem('user_email');
         return savedEmail ? { email: savedEmail } : null;
     });
+    
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
+    const [isStandalone, setIsStandalone] = useState(() => {
+        return window.matchMedia('(display-mode: standalone)').matches 
+            || window.navigator.standalone 
+            || document.referrer.includes('android-app://');
+    });
+
+    useEffect(() => {
+        const handleBeforeInstallPrompt = (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            setDeferredPrompt(e);
+        };
+
+        window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+        const handleAppInstalled = () => {
+            setIsStandalone(true);
+            setDeferredPrompt(null);
+        };
+
+        window.addEventListener('appinstalled', handleAppInstalled);
+
+        return () => {
+            window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+            window.removeEventListener('appinstalled', handleAppInstalled);
+        };
+    }, []);
 
     const login = (email) => {
         setUser({ email });
@@ -118,9 +149,31 @@ function AuthProvider({ children }) {
         localStorage.removeItem('user_email');
     };
 
+    const triggerInstall = async () => {
+        if (!deferredPrompt) return;
+        
+        // Show the install prompt
+        deferredPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        
+        // Optionally, send analytics based on outcome
+        if (outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+        } else {
+            console.log('User dismissed the install prompt');
+        }
+        
+        // We've used the prompt, and can't use it again, so clear it
+        setDeferredPrompt(null);
+    };
+
     return (
         <AuthContext.Provider value={{ user, login, logout }}>
-            {children}
+            <PwaContext.Provider value={{ isStandalone, deferredPrompt, triggerInstall }}>
+                {children}
+            </PwaContext.Provider>
         </AuthContext.Provider>
     );
 }
@@ -376,8 +429,7 @@ function HomeScreen() {
         }
 
         // PWA check
-        const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-        setIsStandalone(isApp);
+        // setIsStandalone is now handled by Context
 
         // Progress check
         const updateProgress = () => {
@@ -424,27 +476,31 @@ function HomeScreen() {
 
             {/* PWA Install Banner */}
             {!isStandalone && (
-                <motion.div 
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-gradient-to-r from-[#C9A84C]/20 to-transparent border border-[#C9A84C]/20 p-4 rounded-2xl flex items-center justify-between gap-4"
-                >
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#C9A84C] flex items-center justify-center text-black">
-                            <Download className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <h4 className="text-white text-sm font-bold uppercase tracking-wider">Instala la aplicación</h4>
-                            <p className="text-zinc-400 text-xs">Acceso rápido y mejor calidad de audio.</p>
-                        </div>
-                    </div>
-                    <button 
-                        onClick={() => window.location.reload()}
-                        className="bg-[#C9A84C] text-black text-[10px] font-bold px-4 py-2 rounded-lg uppercase tracking-widest hover:bg-white transition-colors"
-                    >
-                        Instalar
-                    </button>
-                </motion.div>
+                <PwaContext.Consumer>
+                    {({ deferredPrompt, triggerInstall }) => (
+                        <motion.div 
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            className="bg-gradient-to-r from-[#C9A84C]/20 to-transparent border border-[#C9A84C]/20 p-4 rounded-2xl flex items-center justify-between gap-4"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-[#C9A84C] flex items-center justify-center text-black">
+                                    <Download className="w-5 h-5" />
+                                </div>
+                                <div>
+                                    <h4 className="text-white text-sm font-bold uppercase tracking-wider">Instala la aplicación</h4>
+                                    <p className="text-zinc-400 text-xs">Acceso rápido y mejor calidad de audio.</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={deferredPrompt ? triggerInstall : () => window.dispatchEvent(new CustomEvent('showPwaManual'))}
+                                className="bg-[#C9A84C] text-black text-[10px] font-bold px-4 py-2 rounded-lg uppercase tracking-widest hover:bg-white transition-colors"
+                            >
+                                Instalar
+                            </button>
+                        </motion.div>
+                    )}
+                </PwaContext.Consumer>
             )}
 
             {/* Header Greeting */}
@@ -1452,7 +1508,7 @@ function App() {
     };
 
     return (
-        <AuthProvider>
+        <CombinedProviders>
             <AnimatePresence>
                 {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
             </AnimatePresence>
@@ -1486,7 +1542,7 @@ function App() {
                     <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
             </BrowserRouter>
-        </AuthProvider>
+        </CombinedProviders>
     );
 }
 

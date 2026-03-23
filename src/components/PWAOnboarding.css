@@ -156,6 +156,62 @@
     margin-top: 15px;
 }
 
+.pwa-native-mode {
+    border: 2px solid #C9A84C;
+    background: linear-gradient(135deg, #121214 0%, #0a0a0c 100%);
+    box-shadow: 0 0 40px rgba(201, 168, 76, 0.2);
+}
+
+.pwa-native-action {
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+
+.pwa-install-now-button {
+    background: linear-gradient(135deg, #C9A84C 0%, #b49339 100%);
+    color: #000;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 22px 30px;
+    font-size: 20px;
+    font-weight: 800;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.05em;
+    box-shadow: 0 15px 35px rgba(201, 168, 76, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: pwa-pulse 2s infinite ease-in-out;
+}
+
+.pwa-install-now-button:hover {
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: 0 20px 45px rgba(201, 168, 76, 0.5);
+    background: #fff;
+}
+
+.pwa-install-now-button:active {
+    transform: scale(0.98);
+}
+
+.pwa-install-now-button svg {
+    animation: pwa-float 2s infinite ease-in-out;
+}
+
+@keyframes pwa-pulse {
+    0% { box-shadow: 0 15px 35px rgba(201, 168, 76, 0.4); }
+    50% { box-shadow: 0 15px 45px rgba(201, 168, 76, 0.7); }
+    100% { box-shadow: 0 15px 35px rgba(201, 168, 76, 0.4); }
+}
+
+@keyframes pwa-float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+}
+
 /* Animations from Tailwind or custom */
 @keyframes slide-in-from-bottom {
     from {
