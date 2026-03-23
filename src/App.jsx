@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Activity,
     AudioLines,
@@ -25,12 +24,67 @@ import {
     VolumeX,
     Gift,
     ArrowLeft,
-    Lightbulb
+    Lightbulb,
+    Home,
+    Search,
+    Compass,
+    Settings,
+    Clock,
+    Flame,
+    Copy,
+    Share2,
+    LayoutDashboard
 } from 'lucide-react';
 import PWAOnboarding from './components/PWAOnboarding';
 
 // Support Email
 const SUPPORT_EMAIL = "soporte@frecuenciadavinci.com";
+
+// --- HELPERS ---
+const Separator = () => (
+    <div className="flex items-center justify-center py-10 opacity-30">
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent"></div>
+        <div className="mx-4 text-[#C9A84C] text-lg select-none">✦</div>
+        <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent"></div>
+    </div>
+);
+
+const SplashScreen = ({ onComplete }) => {
+    useEffect(() => {
+        const timer = setTimeout(onComplete, 3000);
+        return () => clearTimeout(timer);
+    }, [onComplete]);
+
+    return (
+        <motion.div 
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] bg-[#0A0E1A] flex flex-col items-center justify-center p-6"
+        >
+            <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="relative"
+            >
+                <div className="absolute inset-0 bg-[#C9A84C] blur-[60px] opacity-20 rounded-full animate-pulse"></div>
+                <AudioLines className="w-24 h-24 text-[#C9A84C] relative z-10" />
+            </motion.div>
+            
+            <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 1, duration: 1 }}
+                className="mt-8 text-center"
+            >
+                <h1 className="text-3xl font-serif tracking-widest text-[#C9A84C] uppercase mb-2">
+                    Frecuencia <span className="font-bold">Da Vinci</span>
+                </h1>
+                <p className="text-zinc-500 font-light tracking-[0.3em] uppercase text-xs">Protocolo Sonoro Premium</p>
+            </motion.div>
+        </motion.div>
+    );
+};
 
 // --- AUTH CONTEXT & PROVIDER ---
 export const AuthContext = React.createContext();
@@ -64,8 +118,15 @@ function LoginScreen() {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isWebView, setIsWebView] = useState(false);
+    const [showCopySuccess, setShowCopySuccess] = useState(false);
     const { login } = React.useContext(AuthContext);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const isWv = /Instagram|FBAN|FBAV/i.test(navigator.userAgent);
+        setIsWebView(isWv);
+    }, []);
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -86,26 +147,68 @@ function LoginScreen() {
         }, 1500);
     };
 
-    return (
-        <div className="min-h-screen bg-[#0D0D0D] flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-md">
+    const copyLink = () => {
+        navigator.clipboard.writeText(window.location.href);
+        setShowCopySuccess(true);
+        setTimeout(() => setShowCopySuccess(false), 2000);
+    };
 
+    return (
+        <div className="min-h-screen bg-[#0A0E1A] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+            {/* Ambient background glows */}
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-[#C9A84C]/[0.05] blur-[120px] pointer-events-none"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#C9A84C]/[0.03] blur-[100px] pointer-events-none"></div>
+
+            <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="w-full max-w-md relative z-10"
+            >
                 {/* Logo Header */}
                 <div className="flex flex-col items-center justify-center mb-10">
                     <div className="relative mb-4">
                         <div className="absolute inset-0 bg-[#C9A84C] blur-2xl opacity-20 rounded-full animate-pulse"></div>
-                        <AudioLines className="w-14 h-14 text-[#C9A84C] relative z-10 drop-shadow-[0_0_15px_rgba(201,168,76,0.3)]" />
+                        <AudioLines className="w-16 h-16 text-[#C9A84C] relative z-10 drop-shadow-[0_0_15px_rgba(201,168,76,0.3)]" />
                     </div>
-                    <h1 className="text-3xl font-light tracking-wide text-zinc-100 uppercase">
+                    <h1 className="text-4xl font-serif font-light tracking-wide text-zinc-100 uppercase">
                         Frecuencia <span className="text-[#C9A84C] font-semibold">Da Vinci</span>
                     </h1>
                 </div>
 
+                {isWebView && (
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="mb-8 bg-black/40 backdrop-blur-xl border border-[#C9A84C]/30 p-4 rounded-2xl"
+                    >
+                        <div className="flex items-start gap-3">
+                            <AlertCircle className="w-5 h-5 text-[#C9A84C] flex-shrink-0 mt-0.5" />
+                            <div>
+                                <h3 className="text-[#C9A84C] font-semibold text-sm mb-1 uppercase tracking-wider">Abre en el navegador</h3>
+                                <p className="text-zinc-400 text-xs leading-relaxed mb-3">
+                                    Para instalar la aplicación y escuchar los audios sin interrupciones, por favor abre este enlace en Safari o Chrome.
+                                </p>
+                                <button 
+                                    onClick={copyLink}
+                                    className="flex items-center gap-2 bg-[#C9A84C]/10 hover:bg-[#C9A84C]/20 text-[#C9A84C] px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                                >
+                                    {showCopySuccess ? (
+                                        <><CheckCircle2 className="w-3.5 h-3.5" /> Link copiado</>
+                                    ) : (
+                                        <><Copy className="w-3.5 h-3.5" /> Copiar link</>
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+
                 {/* Login Box */}
-                <div className="bg-[#121214]/80 backdrop-blur-xl p-8 rounded-3xl border border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.3)] hover:border-white/20 transition-all duration-500">
+                <div className="bg-[#121214]/60 backdrop-blur-2xl p-8 rounded-3xl border border-white/5 shadow-[0_25px_50px_rgba(0,0,0,0.5)]">
                     <div className="text-center mb-8">
-                        <h2 className="text-xl font-medium text-white mb-2">Accede a tu protocolo</h2>
-                        <p className="text-zinc-400 text-sm">
+                        <h2 className="text-2xl font-serif text-white mb-2">Accede a tu protocolo</h2>
+                        <p className="text-zinc-500 text-sm">
                             Ingresa el correo con el que realizaste tu compra
                         </p>
                     </div>
@@ -118,13 +221,13 @@ function LoginScreen() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="tu@correo.com"
                                 required
-                                className="w-full bg-[#27272a] text-white border border-zinc-700 rounded-lg px-4 py-3 focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] transition-colors"
+                                className="w-full bg-[#0A0E1A] text-white border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-[#C9A84C] focus:ring-1 focus:ring-[#C9A84C] transition-all"
                                 disabled={loading}
                             />
                         </div>
 
                         {error && (
-                            <div className="bg-red-900/20 border border-red-900/50 text-red-400 p-3 rounded-lg text-sm text-center">
+                            <div className="bg-red-900/10 border border-red-900/20 text-red-400 p-3 rounded-xl text-sm text-center">
                                 {error}
                             </div>
                         )}
@@ -132,30 +235,254 @@ function LoginScreen() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-[#C9A84C] hover:bg-[#b49339] text-black font-semibold py-3 px-4 rounded-lg transition-colors flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+                            className="w-full bg-[#C9A84C] hover:bg-[#b49339] text-black font-bold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center disabled:opacity-50"
                         >
                             {loading ? (
-                                <span className="flex items-center">
-                                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Verificando...
-                                </span>
+                                <svg className="animate-spin h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
                             ) : (
-                                'Acceder'
+                                'INGRESAR'
                             )}
                         </button>
                     </form>
+                </div>
+            </motion.div>
+        </div>
+    );
+}
 
-                    <div className="mt-8 text-center border-t border-zinc-800 pt-6">
-                        <a href={`mailto:${SUPPORT_EMAIL}`} className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">
-                            ¿Problemas para acceder? Contáctanos
-                        </a>
+const BottomNav = () => {
+    const location = useLocation();
+    
+    const navItems = [
+        { path: '/', icon: Home, label: 'Inicio' },
+        { path: '/protocolo-principal', icon: Music, label: 'Protocolo' },
+        { path: '/botin-digital', icon: Gift, label: 'Bonos' },
+        { path: '/cuenta', icon: User, label: 'Perfil' },
+    ];
+
+    return (
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-20 bg-[#0A0E1A]/80 backdrop-blur-2xl border-t border-white/5 px-6 pb-2 z-50 flex items-center justify-between">
+            {navItems.map((item) => {
+                const isActive = location.pathname === item.path || (item.path === '/' && location.pathname === '/dashboard');
+                return (
+                    <Link
+                        key={item.path}
+                        to={item.path === '/' ? '/dashboard' : item.path}
+                        className="relative flex flex-col items-center justify-center gap-1.5"
+                    >
+                        <div className={`transition-all duration-300 ${isActive ? 'text-[#C9A84C] -translate-y-1' : 'text-zinc-500'}`}>
+                            <item.icon className="w-6 h-6" />
+                        </div>
+                        <span className={`text-[10px] font-medium tracking-wider uppercase transition-all duration-300 ${isActive ? 'text-[#C9A84C] opacity-100' : 'text-zinc-500 opacity-70'}`}>
+                            {item.label}
+                        </span>
+                        {isActive && (
+                            <motion.div 
+                                layoutId="bottomNavDot"
+                                className="absolute -bottom-1 w-1 h-1 bg-[#C9A84C] rounded-full shadow-[0_0_8px_#C9A84C]"
+                            />
+                        )}
+                    </Link>
+                );
+            })}
+        </nav>
+    );
+};
+
+function HomeScreen() {
+    const { user } = React.useContext(AuthContext);
+    const [isStandalone, setIsStandalone] = useState(false);
+    const [progress, setProgress] = useState(0);
+
+    const quotes = [
+        "El silencio no es ausencia de sonido, es presencia de paz interior.",
+        "Tu cerebro se regenera cada noche. Dale las ferramentas correctas.",
+        "La neuroplasticidad es tu superpoder: tu cerebro puede cambiar a cualquier edad.",
+        "Cada frecuencia es un paso hacia tu recuperación total.",
+        "La calma mental comienza con el cuidado de tu sistema nervioso.",
+        "Hoy es un gran día para silenciar el ruido y escuchar tu paz.",
+        "Tu compromiso diario es la clave de tu transformación."
+    ];
+
+    useEffect(() => {
+        const hour = new Date().getHours();
+        if (hour < 12) setGreeting('Buenos días');
+        else if (hour < 18) setGreeting('Buenas tardes');
+        else setGreeting('Buenas noches');
+
+        const dayOfWeek = new Date().getDay();
+        setDailyQuote(quotes[dayOfWeek]);
+
+        // Journey counter
+        const startDate = localStorage.getItem('journey_start');
+        if (!startDate) {
+            const now = new Date().toISOString();
+            localStorage.setItem('journey_start', now);
+            setDayCount(1);
+        } else {
+            const start = new Date(startDate);
+            const today = new Date();
+            const diffTime = Math.abs(today - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            setDayCount(diffDays || 1);
+        }
+
+        // PWA check
+        const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        setIsStandalone(isApp);
+
+        // Progress check
+        const updateProgress = () => {
+            const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+            const totalModules = 12; 
+            setProgress(Math.min(100, Math.round((completed.length / totalModules) * 100)));
+        };
+
+        updateProgress();
+        window.addEventListener('storage', updateProgress);
+        return () => window.removeEventListener('storage', updateProgress);
+    }, []);
+
+    const name = user?.email.split('@')[0];
+
+    const stats = [
+        { label: 'Día de Jornada', value: dayCount, icon: Flame, color: 'text-orange-400' },
+        { label: 'Protocolos Activos', value: '12', icon: Activity, color: 'text-[#C9A84C]' },
+        { label: 'Progresso Total', value: `${progress}%`, icon: CheckCircle2, color: 'text-green-400' },
+    ];
+
+    return (
+        <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-10 pb-20"
+        >
+            {/* Completion Banner */}
+            {progress === 100 && (
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-gradient-to-r from-green-500/20 to-transparent border border-green-500/30 p-8 rounded-[2rem] relative overflow-hidden group"
+                >
+                    <div className="absolute top-0 right-0 p-6 opacity-10">
+                        <Gift className="w-20 h-20 text-green-400" />
                     </div>
+                    <div className="relative z-10">
+                        <h3 className="text-2xl font-serif text-white mb-2">¡Felicidades, {name}! 🏆</h3>
+                        <p className="text-zinc-400 max-w-md">Has completado el Protocolo Da Vinci al 100%. Tu sistema auditivo está ahora en su nivel máximo de regeneración.</p>
+                    </div>
+                </motion.div>
+            )}
+
+            {/* PWA Install Banner */}
+            {!isStandalone && (
+                <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="bg-gradient-to-r from-[#C9A84C]/20 to-transparent border border-[#C9A84C]/20 p-4 rounded-2xl flex items-center justify-between gap-4"
+                >
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[#C9A84C] flex items-center justify-center text-black">
+                            <Download className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h4 className="text-white text-sm font-bold uppercase tracking-wider">Instala la aplicación</h4>
+                            <p className="text-zinc-400 text-xs">Acceso rápido y mejor calidad de audio.</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="bg-[#C9A84C] text-black text-[10px] font-bold px-4 py-2 rounded-lg uppercase tracking-widest hover:bg-white transition-colors"
+                    >
+                        Instalar
+                    </button>
+                </motion.div>
+            )}
+
+            {/* Header Greeting */}
+            <header className="space-y-2">
+                <div className="flex items-center gap-2 text-[#C9A84C] text-[10px] font-bold uppercase tracking-[0.2em]">
+                    <span className="w-8 h-[1px] bg-[#C9A84C]"></span>
+                    Bienvenido a tu Espacio
+                </div>
+                <h1 className="text-4xl md:text-5xl font-serif text-white py-1">
+                    {greeting}, <span className="text-[#C9A84C] italic">{name}</span> ✦
+                </h1>
+                <p className="text-zinc-400 text-lg font-light">Tu jornada hacia el silencio continúá.</p>
+            </header>
+
+            {/* Daily Quote Card */}
+            <div className="bg-gradient-to-br from-[#121214] to-[#0A0E1A] border border-white/5 rounded-3xl p-8 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <Lightbulb className="w-24 h-24 text-[#C9A84C]" />
+                </div>
+                <div className="relative z-10">
+                    <div className="flex items-center gap-2 text-zinc-500 text-[10px] font-bold uppercase tracking-widest mb-4">
+                        <Clock className="w-3 h-3" /> Dato del Día
+                    </div>
+                    <p className="text-xl md:text-2xl font-serif text-zinc-200 leading-relaxed max-w-2xl">
+                        "{dailyQuote}"
+                    </p>
                 </div>
             </div>
-        </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {stats.map((stat, i) => (
+                    <div key={i} className="bg-[#121214]/40 border border-white/5 p-6 rounded-2xl flex items-center gap-4">
+                        <div className={`p-3 rounded-xl bg-white/5 ${stat.color}`}>
+                            <stat.icon className="w-6 h-6" />
+                        </div>
+                        <div>
+                            <p className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">{stat.label}</p>
+                            <p className="text-2xl font-serif text-white">{stat.value}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <Separator />
+
+            {/* Quick Actions / Featured */}
+            <section className="space-y-6">
+                <h3 className="text-2xl font-serif text-white">Tu Protocolo Hoy</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Link to="/protocolo-principal" className="bg-[#121214]/60 border border-white/5 p-8 rounded-3xl hover:border-[#C9A84C]/50 transition-all group relative overflow-hidden">
+                         <div className="absolute top-0 right-0 w-32 h-32 bg-[#C9A84C]/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-[#C9A84C]/10 transition-all"></div>
+                         <div className="flex flex-col gap-4 relative z-10">
+                            <div className="w-12 h-12 rounded-2xl bg-[#C9A84C]/10 flex items-center justify-center text-[#C9A84C]">
+                                <Music className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-1">Sesión Principal</h4>
+                                <p className="text-zinc-500 text-sm">Escucha la frecuencia regenerativa Da Vinci (7 min).</p>
+                            </div>
+                            <div className="flex items-center gap-2 text-[#C9A84C] text-xs font-bold uppercase tracking-widest mt-2">
+                                Iniciar ahora <ArrowLeft className="w-4 h-4 rotate-180" />
+                            </div>
+                         </div>
+                    </Link>
+                    
+                    <Link to="/bonus-1" className="bg-[#121214]/60 border border-white/5 p-8 rounded-3xl hover:border-[#C9A84C]/50 transition-all group relative overflow-hidden">
+                         <div className="flex flex-col gap-4 relative z-10">
+                            <div className="w-12 h-12 rounded-2xl bg-[#C9A84C]/10 flex items-center justify-center text-[#C9A84C]">
+                                <Brain className="w-6 h-6" />
+                            </div>
+                            <div>
+                                <h4 className="text-xl font-bold text-white mb-1">Niebla Mental</h4>
+                                <p className="text-zinc-500 text-sm">Protocolo matutino para claridad inmediata (3 min).</p>
+                            </div>
+                            <div className="flex items-center gap-2 text-[#C9A84C] text-xs font-bold uppercase tracking-widest mt-2">
+                                Visualizar <ArrowLeft className="w-4 h-4 rotate-180" />
+                            </div>
+                         </div>
+                    </Link>
+                </div>
+            </section>
+        </motion.div>
     );
 }
 
@@ -166,7 +493,8 @@ function DashboardLayout({ children }) {
     const location = useLocation();
 
     const navItems = [
-        { path: '/', icon: Music, label: 'Protocolo Principal' },
+        { path: '/dashboard', icon: LayoutDashboard, label: 'Inicio' },
+        { path: '/protocolo-principal', icon: Music, label: 'Protocolo Principal' },
         { path: '/reset-nervio', icon: Activity, label: 'Reset del Nervio Auditivo' },
         { path: '/reconstruccion-cognitiva', icon: Lightbulb, label: 'Reconstrucción Cognitiva' },
         { path: '/bonus-1', icon: Brain, label: 'Eliminador de Niebla Mental' },
@@ -182,52 +510,34 @@ function DashboardLayout({ children }) {
     }, [location.pathname]);
 
     return (
-        <div className="flex min-h-screen bg-[#0D0D0D] text-zinc-300 relative overflow-hidden">
+        <div className="flex min-h-screen bg-[#0A0E1A] text-zinc-300 relative overflow-hidden">
+            
+            {/* Desktop Sidebar Navigation */}
+            <aside className={`fixed inset-y-0 left-0 z-40 w-72 bg-[#121214]/80 backdrop-blur-2xl border-r border-white/5 shadow-[5px_0_30px_rgba(0,0,0,0.5)] transform transition-transform duration-400 ease-in-out lg:translate-x-0 lg:static lg:flex-shrink-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                <div className="h-full flex flex-col">
 
-            {/* Ambient Background Efect */}
-            <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
-                <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#C9A84C]/[0.03] blur-[120px]"></div>
-                <div className="absolute bottom-[-20%] right-[-10%] w-[40%] h-[40%] rounded-full bg-[#C9A84C]/[0.02] blur-[100px]"></div>
-            </div>
-
-            {/* Mobile Top Header */}
-            <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-[#121214]/80 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4 z-50 shadow-md">
-                <div className="flex items-center text-white">
-                    <AudioLines className="w-6 h-6 text-[#C9A84C] mr-2" />
-                    <span className="font-semibold tracking-wide">Da Vinci</span>
-                </div>
-                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-zinc-400 hover:text-white p-2">
-                    {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-                </button>
-            </div>
-
-            {/* Sidebar Navigation */}
-            <aside className={`fixed inset-y-0 left-0 z-40 w-64 bg-[#121214]/90 backdrop-blur-2xl border-r border-white/5 shadow-[5px_0_30px_rgba(0,0,0,0.5)] transform transition-transform duration-400 ease-in-out lg:translate-x-0 lg:static lg:flex-shrink-0 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-                <div className="h-full flex flex-col pt-16 lg:pt-0">
-
-                    {/* Sidebar Logo (Desktop Only) */}
-                    <div className="hidden lg:flex items-center justify-center py-8 border-b border-zinc-800">
+                    {/* Sidebar Logo */}
+                    <div className="flex items-center justify-center py-10 border-b border-white/5">
                         <AudioLines className="w-8 h-8 text-[#C9A84C] mr-3" />
-                        <span className="font-light tracking-widest text-white uppercase text-sm">
+                        <span className="font-serif tracking-widest text-white uppercase text-sm">
                             Frecuencia <span className="font-bold text-[#C9A84C]">Da Vinci</span>
                         </span>
                     </div>
 
                     {/* Navigation Links */}
-                    <nav className="flex-1 py-6 px-3 space-y-2 overflow-y-auto">
+                    <nav className="flex-1 py-10 px-6 space-y-2 overflow-y-auto custom-scrollbar">
                         {navItems.map((item) => {
-                            const isActive = location.pathname === item.path;
+                            const isActive = location.pathname === item.path || (item.path === '/dashboard' && location.pathname === '/');
                             return (
                                 <Link
                                     key={item.path}
                                     to={item.path}
-                                    className={`relative flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all duration-300 group overflow-hidden ${isActive
-                                        ? 'text-[#C9A84C] bg-gradient-to-r from-[#C9A84C]/10 to-transparent shadow-[inset_1px_0_0_0_#C9A84C]'
-                                        : 'text-zinc-400 hover:text-white hover:bg-white/5'
+                                    className={`relative flex items-center px-5 py-4 text-sm font-medium rounded-2xl transition-all duration-300 group ${isActive
+                                        ? 'text-[#C9A84C] bg-[#C9A84C]/10 shadow-[inset_1px_0_0_0_#C9A84C]'
+                                        : 'text-zinc-500 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
-                                    {isActive && <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-[#C9A84C] rounded-r-full shadow-[0_0_10px_#C9A84C]"></div>}
-                                    <item.icon className={`w-5 h-5 mr-3 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(201,168,76,0.5)]' : 'group-hover:scale-110'}`} />
+                                    <item.icon className={`w-5 h-5 mr-4 flex-shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 text-[#C9A84C]' : 'group-hover:scale-110 text-zinc-600'}`} />
                                     {item.label}
                                 </Link>
                             );
@@ -237,16 +547,29 @@ function DashboardLayout({ children }) {
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 min-w-0 flex flex-col relative pt-16 lg:pt-0 z-10">
-                <div className="flex-1 p-6 sm:p-10 max-w-4xl mx-auto w-full">
-                    {children}
+            <main className="flex-1 min-w-0 flex flex-col relative z-10 lg:h-screen lg:overflow-y-auto">
+                <div className="flex-1 p-6 sm:p-10 md:p-16 max-w-5xl mx-auto w-full pb-32 lg:pb-16">
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key={location.pathname}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            {children}
+                        </motion.div>
+                    </AnimatePresence>
                 </div>
             </main>
+
+            {/* Bottom Navigation for Mobile */}
+            <BottomNav />
 
             {/* Mobile Menu Backdrop */}
             {mobileMenuOpen && (
                 <div
-                    className="lg:hidden fixed inset-0 bg-black/60 z-30"
+                    className="lg:hidden fixed inset-0 bg-black/60 z-30 backdrop-blur-sm"
                     onClick={() => setMobileMenuOpen(false)}
                 />
             )}
@@ -310,31 +633,41 @@ function CustomAudioPlayer({ src, title, customDuration }) {
         setProgress(e.target.value);
     };
 
+    const markAsComplete = (id) => {
+        const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+        if (!completed.includes(id)) {
+            completed.push(id);
+            localStorage.setItem('completed_modules', JSON.stringify(completed));
+            // Trigger storage event for HomeScreen to update
+            window.dispatchEvent(new Event('storage'));
+        }
+    };
+
     return (
-        <div className="bg-[#121214]/80 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-10 mb-10 text-center shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative overflow-hidden group transition-all duration-500 hover:border-[#C9A84C]/30">
+        <div className="bg-[#121214]/60 backdrop-blur-2xl border border-white/5 rounded-[2rem] p-8 sm:p-12 mb-12 text-center shadow-[0_25px_50px_rgba(0,0,0,0.5)] relative overflow-hidden group transition-all duration-500 hover:border-[#C9A84C]/30">
             {/* Top gold accent line */}
             <div className="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent opacity-80"></div>
 
             {/* Ambient background glow when playing */}
-            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-[#C9A84C]/5 rounded-full blur-3xl transition-opacity duration-1000 pointer-events-none ${isPlaying ? 'opacity-100' : 'opacity-0'}`}></div>
+            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-[#C9A84C]/5 rounded-full blur-3xl transition-opacity duration-1000 pointer-events-none ${isPlaying ? 'opacity-100' : 'opacity-0'}`}></div>
 
             <div className="relative z-10 flex flex-col items-center">
 
                 {/* Visualizer Icon / Title */}
                 <div className="mb-10 relative">
-                    <div className={`absolute inset-0 bg-[#C9A84C] blur-[40px] rounded-full transition-opacity duration-1000 ${isPlaying ? 'opacity-40' : 'opacity-0'}`}></div>
-                    <AudioLines className={`w-14 h-14 mx-auto mb-4 relative z-10 transition-all duration-700 ${isPlaying ? 'text-[#C9A84C] scale-110 animate-pulse drop-shadow-[0_0_15px_rgba(201,168,76,0.6)]' : 'text-zinc-600'}`} />
-                    <h3 className="text-xl font-medium tracking-wide bg-gradient-to-br from-zinc-100 to-zinc-400 bg-clip-text text-transparent relative z-10">{title}</h3>
+                    <div className={`absolute inset-0 bg-[#C9A84C] blur-[50px] rounded-full transition-opacity duration-1000 ${isPlaying ? 'opacity-40' : 'opacity-0'}`}></div>
+                    <AudioLines className={`w-16 h-16 mx-auto mb-6 relative z-10 transition-all duration-700 ${isPlaying ? 'text-[#C9A84C] scale-110 animate-pulse drop-shadow-[0_0_20px_rgba(201,168,76,0.6)]' : 'text-zinc-700'}`} />
+                    <h3 className="text-2xl font-serif font-medium tracking-wide bg-gradient-to-br from-zinc-100 to-zinc-400 bg-clip-text text-transparent relative z-10">{title}</h3>
                 </div>
 
                 {/* Progress Bar Area */}
-                <div className="w-full max-w-md mx-auto mb-8">
-                    <div className="flex justify-between text-xs font-mono text-zinc-500 mb-2 px-1">
+                <div className="w-full max-w-md mx-auto mb-10">
+                    <div className="flex justify-between text-[10px] font-bold tracking-widest text-zinc-500 mb-3 px-1 uppercase">
                         <span>{currentTime}</span>
                         <span>{duration}</span>
                     </div>
 
-                    <div className="relative h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden cursor-pointer group/slider">
+                    <div className="relative h-2 w-full bg-[#0A0E1A] rounded-full overflow-hidden cursor-pointer group/slider">
                         <div
                             className="absolute top-0 left-0 h-full bg-gradient-to-r from-[#C9A84C] to-[#b49339] rounded-full"
                             style={{ width: `${progress}%` }}
@@ -353,16 +686,16 @@ function CustomAudioPlayer({ src, title, customDuration }) {
                 {/* Big Play Button */}
                 <button
                     onClick={togglePlay}
-                    className="relative flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-b from-[#C9A84C] to-[#b49339] text-black shadow-[0_0_20px_rgba(201,168,76,0.2)] hover:shadow-[0_0_25px_rgba(201,168,76,0.4)] hover:scale-105 transition-all duration-300"
+                    className="relative flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-b from-[#C9A84C] to-[#b49339] text-black shadow-[0_10px_30px_rgba(201,168,76,0.3)] hover:shadow-[0_15px_40px_rgba(201,168,76,0.5)] hover:scale-105 transition-all duration-300 active:scale-95"
                 >
                     {isPlaying ? (
-                        <Pause className="w-6 h-6 fill-black" />
+                        <Pause className="w-8 h-8 fill-black" />
                     ) : (
-                        <Play className="w-6 h-6 fill-black ml-1" />
+                        <Play className="w-8 h-8 fill-black ml-1" />
                     )}
                 </button>
-                <div className="mt-4 text-xs tracking-widest text-[#C9A84C]/50 uppercase font-semibold">
-                    {isPlaying ? 'Reproduciendo' : 'Pulsa para iniciar'}
+                <div className="mt-6 text-[10px] tracking-[0.3em] text-[#C9A84C]/60 uppercase font-black">
+                    {isPlaying ? 'Reproduciendo Protocolo' : 'Pulsa para iniciar sesión'}
                 </div>
 
             </div>
@@ -372,7 +705,12 @@ function CustomAudioPlayer({ src, title, customDuration }) {
                 src={src}
                 onTimeUpdate={handleTimeUpdate}
                 onLoadedMetadata={handleLoadedMetadata}
-                onEnded={() => { setIsPlaying(false); setProgress(0); setCurrentTime('0:00'); }}
+                onEnded={() => { 
+                    setIsPlaying(false); 
+                    setProgress(0); 
+                    setCurrentTime('0:00'); 
+                    markAsComplete(title.toLowerCase().replace(/\s+/g, '-'));
+                }}
             />
         </div>
     );
@@ -388,9 +726,9 @@ function ProtocoloPrincipal() {
                 </span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4 tracking-tight py-1">
                 La Frecuencia Da Vinci
-                <span className="block text-2xl font-light text-zinc-400 mt-1">— Protocolo Completo</span>
+                <span className="block text-2xl font-light text-[#C9A84C] mt-2 italic">— Protocolo Completo ✦</span>
             </h1>
 
             <p className="text-lg text-zinc-300 mb-10 max-w-2xl leading-relaxed">
@@ -541,65 +879,75 @@ function GammaViewer({ src, title }) {
         };
     }, []);
 
-    return (
-        <div
-            ref={containerRef}
-            className="relative w-full rounded-xl overflow-hidden border border-zinc-800 bg-[#18181b] shadow-2xl group transition-all duration-300"
-            style={{
-                height: isFullscreen ? '100vh' : 'calc(100vh - 200px)',
-                minHeight: isFullscreen ? '100vh' : '450px',
-                maxHeight: isFullscreen ? '100vh' : '850px'
-            }}
-        >
-            {/* Loading Skeleton/Spinner */}
-            {isLoading && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#18181b] z-10">
-                    <div className="w-10 h-10 border-4 border-zinc-800 border-t-[#C9A84C] rounded-full animate-spin mb-4"></div>
-                    <p className="text-zinc-500 text-sm animate-pulse tracking-wide">Cargando documento...</p>
-                </div>
-            )}
+    const isCompleted = JSON.parse(localStorage.getItem('completed_modules') || '[]').includes(title.toLowerCase().replace(/\s+/g, '-'));
 
-            {/* Top bar with controls */}
-            <div className={`absolute top-0 inset-x-0 z-20 flex items-center justify-between px-3 md:px-4 py-3 bg-gradient-to-b from-black/90 via-black/50 to-transparent transition-opacity duration-500 pointer-events-none ${showControls || !isFullscreen ? 'opacity-100' : 'opacity-0'}`}>
-                <span className="text-xs md:text-sm text-zinc-300 font-medium truncate max-w-[45%] md:max-w-[70%] drop-shadow-md">
-                    {title}
-                </span>
-                <div className="flex items-center gap-2 pointer-events-auto">
-                    <a
-                        href={src.replace('/embed/', '/').split('?')[0]}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-1.5 bg-black/60 hover:bg-black text-zinc-200 hover:text-white text-xs px-3 py-2 rounded-lg transition-all border border-white/10 backdrop-blur-md active:scale-95"
-                        title="Abrir en nueva pestaña"
-                    >
-                        <ExternalLink className="w-4 h-4" />
-                        <span className="hidden sm:inline font-medium">Abrir</span>
-                    </a>
-                    <button
-                        onClick={toggleFullscreen}
-                        className="flex items-center justify-center gap-1.5 bg-[#C9A84C]/20 hover:bg-[#C9A84C]/30 text-[#C9A84C] hover:text-[#e5ca76] text-xs px-3 py-2 rounded-lg transition-all border border-[#C9A84C]/30 backdrop-blur-md active:scale-95 shadow-[0_0_10px_rgba(201,168,76,0.1)]"
-                        title={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
-                    >
-                        {isFullscreen
-                            ? <Minimize className="w-4 h-4" />
-                            : <Maximize className="w-4 h-4" />}
-                        <span className="hidden sm:inline font-medium">{isFullscreen ? 'Salir' : 'Ampliar'}</span>
-                    </button>
+    const markAsFinished = () => {
+        const id = title.toLowerCase().replace(/\s+/g, '-');
+        const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+        if (!completed.includes(id)) {
+            localStorage.setItem('completed_modules', JSON.stringify([...completed, id]));
+            window.dispatchEvent(new Event('storage'));
+            window.location.reload(); // Simple way to refresh local state in this component
+        }
+    };
+
+    return (
+        <div className="flex flex-col gap-6">
+            <div
+                ref={containerRef}
+                className="relative w-full rounded-[2rem] overflow-hidden border border-white/5 bg-[#0A0E1A] shadow-2xl group transition-all duration-300"
+                style={{
+                    height: isFullscreen ? '100vh' : 'calc(100vh - 250px)',
+                    minHeight: isFullscreen ? '100vh' : '500px',
+                    maxHeight: isFullscreen ? '100vh' : '850px'
+                }}
+            >
+                {/* Loading Skeleton/Spinner */}
+                {isLoading && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0A0E1A] z-10 font-inter">
+                        <div className="w-10 h-10 border-2 border-[#C9A84C]/20 border-t-[#C9A84C] rounded-full animate-spin mb-4"></div>
+                        <p className="text-zinc-500 text-xs animate-pulse tracking-[0.2em] uppercase font-bold">Iniciando Experiencia...</p>
+                    </div>
+                )}
+
+                {/* Top bar with controls */}
+                <div className={`absolute top-0 inset-x-0 z-20 flex items-center justify-between px-4 md:px-6 py-4 bg-gradient-to-b from-black/80 to-transparent transition-opacity duration-500 pointer-events-none ${showControls || !isFullscreen ? 'opacity-100' : 'opacity-0'}`}>
+                    <span className="text-xs md:text-sm text-zinc-300 font-serif italic truncate max-w-[45%] md:max-w-[70%]">
+                        {title}
+                    </span>
+                    <div className="flex items-center gap-3 pointer-events-auto">
+                        <button
+                            onClick={toggleFullscreen}
+                            className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl transition-all border border-white/10 backdrop-blur-md active:scale-95"
+                        >
+                            {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                            <span className="hidden sm:inline">{isFullscreen ? 'Cerrar' : 'Ampliar'}</span>
+                        </button>
+                    </div>
                 </div>
+
+                {/* The gamma iframe */}
+                <iframe
+                    src={src}
+                    title={title}
+                    allow="fullscreen"
+                    onLoad={() => setIsLoading(false)}
+                    className={`w-full h-full border-0 transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+                    style={{ display: 'block' }}
+                />
+
+                {/* Gold accent top line */}
+                <div className={`absolute top-0 inset-x-0 h-[1px] bg-[#C9A84C]/50 z-30 transition-opacity duration-500 ${showControls || !isFullscreen ? 'opacity-100' : 'opacity-0'}`} />
             </div>
 
-            {/* The gamma iframe */}
-            <iframe
-                src={src}
-                title={title}
-                allow="fullscreen"
-                onLoad={() => setIsLoading(false)}
-                className={`w-full h-full border-0 transition-opacity duration-700 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-                style={{ display: 'block' }}
-            />
-
-            {/* Gold accent top line */}
-            <div className={`absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent z-30 transition-opacity duration-500 ${showControls || !isFullscreen ? 'opacity-80' : 'opacity-0'}`} />
+            {!isCompleted && (
+                <button 
+                    onClick={markAsFinished}
+                    className="w-full py-4 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 rounded-2xl font-bold text-sm tracking-widest uppercase transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                    <CheckCircle2 className="w-5 h-5" /> Marcar como Finalizado
+                </button>
+            )}
         </div>
     );
 }
@@ -757,39 +1105,69 @@ function ResetNervioScreen() {
         }
     ];
 
+    const [completedItems, setCompletedItems] = useState([]);
+
+    useEffect(() => {
+        const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+        setCompletedItems(completed);
+    }, []);
+
+    const markAsComplete = (id) => {
+        const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+        if (!completed.includes(id)) {
+            const updated = [...completed, id];
+            localStorage.setItem('completed_modules', JSON.stringify(updated));
+            setCompletedItems(updated);
+            window.dispatchEvent(new Event('storage'));
+        }
+    };
+
     const renderCard = (item, isBono) => {
         const isExpanded = expandedItem === item.id;
+        const isCompleted = completedItems.includes(item.id);
         
         return (
-            <div key={item.id} className={`bg-[#121214]/80 backdrop-blur-xl border border-white/10 ${isExpanded ? 'border-[#C9A84C]/50 shadow-[0_15px_40px_rgba(201,168,76,0.15)]' : 'hover:border-[#C9A84C]/30 shadow-[0_15px_40px_rgba(0,0,0,0.3)]'} rounded-3xl p-6 sm:p-8 transition-all duration-300 group flex flex-col h-full overflow-hidden`}>
+            <div key={item.id} className={`bg-[#121214]/60 backdrop-blur-2xl border border-white/5 ${isExpanded ? 'border-[#C9A84C]/50 shadow-[0_20px_40px_rgba(201,168,76,0.1)]' : 'hover:border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.3)]'} rounded-[2rem] p-6 sm:p-8 transition-all duration-300 group flex flex-col h-full overflow-hidden relative`}>
+                
+                {isCompleted && (
+                    <div className="absolute top-6 right-6 text-green-500 animate-in zoom-in duration-500">
+                        <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                )}
+
                 {isBono && (
-                    <div className="bg-[#C9A84C]/10 text-[#C9A84C] text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 inline-block w-max border border-[#C9A84C]/20 shadow-[0_0_10px_rgba(201,168,76,0.05)]">
+                    <div className="bg-[#C9A84C]/10 text-[#C9A84C] text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-5 inline-block w-max border border-[#C9A84C]/20">
                         {item.tag}
                     </div>
                 )}
                 
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-wide">{item.title}</h3>
-                <p className="text-zinc-400 text-base mb-8 flex-grow leading-relaxed">{item.subtitle}</p>
+                <h3 className="text-xl sm:text-2xl font-serif font-bold text-white mb-3 tracking-wide">{item.title}</h3>
+                <p className="text-zinc-500 text-base mb-8 flex-grow leading-relaxed font-light">{item.subtitle}</p>
                 
-                <button 
-                    onClick={() => toggleItem(item.id)}
-                    className="w-full bg-gradient-to-r from-[#C9A84C] to-[#b49339] hover:from-[#e5ca76] hover:to-[#C9A84C] text-black font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(201,168,76,0.3)] hover:shadow-[0_0_20px_rgba(201,168,76,0.5)] group-hover:scale-[1.01]"
-                >
-                    {isExpanded ? (
-                        <>
-                            <Minimize className="w-5 h-5 mr-2" />
-                            Ocultar Contenido
-                        </>
-                    ) : (
-                        <>
-                            <Maximize className="w-5 h-5 mr-2" />
-                            Ver Contenido
-                        </>
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <button 
+                        onClick={() => toggleItem(item.id)}
+                        className={`flex-1 ${isExpanded ? 'bg-white/10 text-white' : 'bg-gradient-to-r from-[#C9A84C] to-[#b49339] text-black'} font-bold py-4 px-4 rounded-2xl transition-all duration-300 flex items-center justify-center shadow-lg active:scale-95`}
+                    >
+                        {isExpanded ? (
+                            <><Minimize className="w-5 h-5 mr-2" /> Ocultar</>
+                        ) : (
+                            <><Maximize className="w-5 h-5 mr-2" /> Ver Contenido</>
+                        )}
+                    </button>
+                    
+                    {!isCompleted && isExpanded && (
+                        <button 
+                            onClick={() => markAsComplete(item.id)}
+                            className="bg-green-500/10 hover:bg-green-500/20 text-green-400 font-bold py-4 px-6 rounded-2xl transition-all border border-green-500/20 active:scale-95"
+                        >
+                            Finalizado
+                        </button>
                     )}
-                </button>
+                </div>
 
                 {isExpanded && (
-                    <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="mt-8 pt-8 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-500">
                         <GammaViewer src={item.src} title={item.title} />
                     </div>
                 )}
@@ -941,9 +1319,9 @@ function ProfileScreen() {
                     Cerrar sesión
                 </button>
 
-                <div className="text-sm text-zinc-500 bg-[#0D0D0D] p-4 rounded-lg flex items-start">
+                <div className="text-sm text-zinc-500 bg-[#0A0E1A] p-4 rounded-lg flex items-start">
                     <AlertCircle className="w-5 h-5 mr-3 text-zinc-600 flex-shrink-0" />
-                    <p className="text-left">
+                    <p className="text-left font-inter">
                         ¿Tienes alguna pregunta o necesitas asistencia táctica? Escríbenos a{' '}
                         <a href={`mailto:${SUPPORT_EMAIL}`} className="text-[#C9A84C] hover:underline">
                             {SUPPORT_EMAIL}
@@ -973,8 +1351,22 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function App() {
+    const [showSplash, setShowSplash] = useState(() => {
+        // Check if session already active to avoid splash on every refresh in same session
+        return !sessionStorage.getItem('splash_shown');
+    });
+
+    const handleSplashComplete = () => {
+        setShowSplash(false);
+        sessionStorage.setItem('splash_shown', 'true');
+    };
+
     return (
         <AuthProvider>
+            <AnimatePresence>
+                {showSplash && <SplashScreen onComplete={handleSplashComplete} />}
+            </AnimatePresence>
+            
             <BrowserRouter>
                 <Routes>
                     {/* Public Login Route */}
@@ -982,13 +1374,16 @@ function App() {
                         path="/login"
                         element={
                             <AuthContext.Consumer>
-                                {({ user }) => (user ? <Navigate to="/" replace /> : <LoginScreen />)}
+                                {({ user }) => (user ? <Navigate to="/dashboard" replace /> : <LoginScreen />)}
                             </AuthContext.Consumer>
                         }
                     />
 
                     {/* Protected Routes inside Dashboard */}
-                    <Route path="/" element={<ProtectedRoute><ProtocoloPrincipal /></ProtectedRoute>} />
+                    <Route path="/" element={<ProtectedRoute><HomeScreen /></ProtectedRoute>} />
+                    <Route path="/dashboard" element={<ProtectedRoute><HomeScreen /></ProtectedRoute>} />
+                    <Route path="/protocolo-principal" element={<ProtectedRoute><ProtocoloPrincipal /></ProtectedRoute>} />
+                    <Route path="/botin-digital" element={<ProtectedRoute><Bonus4Screen /></ProtectedRoute>} />
                     <Route path="/reconstruccion-cognitiva" element={<ProtectedRoute><ReconstruccionCognitivaScreen /></ProtectedRoute>} />
                     <Route path="/reset-nervio" element={<ProtectedRoute><ResetNervioScreen /></ProtectedRoute>} />
                     <Route path="/bonus-1" element={<ProtectedRoute><Bonus1Screen /></ProtectedRoute>} />
@@ -998,7 +1393,7 @@ function App() {
                     <Route path="/cuenta" element={<ProtectedRoute><ProfileScreen /></ProtectedRoute>} />
 
                     {/* Fallback */}
-                    <Route path="*" element={<Navigate to="/" replace />} />
+                    <Route path="*" element={<Navigate to="/dashboard" replace />} />
                 </Routes>
             </BrowserRouter>
         </AuthProvider>
