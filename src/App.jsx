@@ -298,6 +298,9 @@ function HomeScreen() {
     const { user } = React.useContext(AuthContext);
     const [isStandalone, setIsStandalone] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [greeting, setGreeting] = useState('');
+    const [dailyQuote, setDailyQuote] = useState('');
+    const [dayCount, setDayCount] = useState(0);
 
     const quotes = [
         "El silencio no es ausencia de sonido, es presencia de paz interior.",
@@ -1209,6 +1212,22 @@ function ResetNervioScreen() {
 
 function ReconstruccionCognitivaScreen() {
     const [expandedItem, setExpandedItem] = useState(null);
+    const [completedItems, setCompletedItems] = useState([]);
+
+    useEffect(() => {
+        const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+        setCompletedItems(completed);
+    }, []);
+
+    const markAsComplete = (id) => {
+        const completed = JSON.parse(localStorage.getItem('completed_modules') || '[]');
+        if (!completed.includes(id)) {
+            const updated = [...completed, id];
+            localStorage.setItem('completed_modules', JSON.stringify(updated));
+            setCompletedItems(updated);
+            window.dispatchEvent(new Event('storage'));
+        }
+    };
 
     const toggleItem = (id) => {
         if (expandedItem === id) {
@@ -1247,31 +1266,44 @@ function ReconstruccionCognitivaScreen() {
 
     const renderCard = (item) => {
         const isExpanded = expandedItem === item.id;
+        const isCompleted = completedItems.includes(item.id);
         
         return (
-            <div key={item.id} className={`bg-[#121214]/80 backdrop-blur-xl border border-white/10 ${isExpanded ? 'border-[#C9A84C]/50 shadow-[0_15px_40px_rgba(201,168,76,0.15)]' : 'hover:border-[#C9A84C]/30 shadow-[0_15px_40px_rgba(0,0,0,0.3)]'} rounded-3xl p-6 sm:p-8 transition-all duration-300 group flex flex-col h-full overflow-hidden`}>
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 tracking-wide">{item.title}</h3>
-                <p className="text-zinc-400 text-base mb-8 flex-grow leading-relaxed">{item.subtitle}</p>
+            <div key={item.id} className={`bg-[#121214]/60 backdrop-blur-2xl border border-white/5 ${isExpanded ? 'border-[#C9A84C]/50 shadow-[0_20px_40px_rgba(201,168,76,0.1)]' : 'hover:border-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.3)]'} rounded-[2rem] p-6 sm:p-8 transition-all duration-300 group flex flex-col h-full overflow-hidden relative`}>
                 
-                <button 
-                    onClick={() => toggleItem(item.id)}
-                    className="w-full bg-gradient-to-r from-[#C9A84C] to-[#b49339] hover:from-[#e5ca76] hover:to-[#C9A84C] text-black font-semibold py-3.5 px-4 rounded-xl transition-all duration-300 flex items-center justify-center shadow-[0_0_15px_rgba(201,168,76,0.3)] hover:shadow-[0_0_20px_rgba(201,168,76,0.5)] group-hover:scale-[1.01]"
-                >
-                    {isExpanded ? (
-                        <>
-                            <Minimize className="w-5 h-5 mr-2" />
-                            Ocultar Contenido
-                        </>
-                    ) : (
-                        <>
-                            <Maximize className="w-5 h-5 mr-2" />
-                            Ver Contenido
-                        </>
+                {isCompleted && (
+                    <div className="absolute top-6 right-6 text-green-500 animate-in zoom-in duration-500">
+                        <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                )}
+                
+                <h3 className="text-xl sm:text-2xl font-serif font-bold text-white mb-3 tracking-wide">{item.title}</h3>
+                <p className="text-zinc-500 text-base mb-8 flex-grow leading-relaxed font-light">{item.subtitle}</p>
+                
+                <div className="flex flex-col sm:flex-row gap-3">
+                    <button 
+                        onClick={() => toggleItem(item.id)}
+                        className={`flex-1 ${isExpanded ? 'bg-white/10 text-white' : 'bg-gradient-to-r from-[#C9A84C] to-[#b49339] text-black'} font-bold py-4 px-4 rounded-2xl transition-all duration-300 flex items-center justify-center shadow-lg active:scale-95`}
+                    >
+                        {isExpanded ? (
+                            <><Minimize className="w-5 h-5 mr-2" /> Ocultar</>
+                        ) : (
+                            <><Maximize className="w-5 h-5 mr-2" /> Ver Contenido</>
+                        )}
+                    </button>
+                    
+                    {!isCompleted && isExpanded && (
+                        <button 
+                            onClick={() => markAsComplete(item.id)}
+                            className="bg-green-500/10 hover:bg-green-500/20 text-green-400 font-bold py-4 px-6 rounded-2xl transition-all border border-green-500/20 active:scale-95"
+                        >
+                            Finalizado
+                        </button>
                     )}
-                </button>
+                </div>
 
                 {isExpanded && (
-                    <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <div className="mt-8 pt-8 border-t border-white/5 animate-in fade-in slide-in-from-top-4 duration-500">
                         <GammaViewer src={item.src} title={item.title} />
                     </div>
                 )}
