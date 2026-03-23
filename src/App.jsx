@@ -266,7 +266,7 @@ function LoginScreen() {
     );
 }
 
-const BottomNav = () => {
+const BottomNav = ({ onMenuClick }) => {
     const location = useLocation();
     
     const navItems = [
@@ -301,9 +301,38 @@ const BottomNav = () => {
                     </Link>
                 );
             })}
+            
+            <button
+                onClick={onMenuClick}
+                className="relative flex flex-col items-center justify-center gap-1.5 text-zinc-500 hover:text-white transition-all"
+            >
+                <Menu className="w-6 h-6" />
+                <span className="text-[10px] font-medium tracking-wider uppercase opacity-70">Menu</span>
+            </button>
         </nav>
     );
 };
+
+const ModuleCard = ({ to, icon: Icon, title, desc, highlight = false }) => (
+    <Link 
+        to={to} 
+        className={`${highlight ? 'bg-[#121214]/80 border-[#C9A84C]/30' : 'bg-[#121214]/40 border-white/5'} border p-6 rounded-3xl hover:border-[#C9A84C]/50 transition-all group relative overflow-hidden flex flex-col gap-4`}
+    >
+        {highlight && (
+            <div className="absolute top-0 right-0 w-24 h-24 bg-[#C9A84C]/5 blur-2xl rounded-full -mr-12 -mt-12 group-hover:bg-[#C9A84C]/10 transition-all"></div>
+        )}
+        <div className={`w-10 h-10 rounded-2xl ${highlight ? 'bg-[#C9A84C]/20 text-[#C9A84C]' : 'bg-white/5 text-zinc-400 group-hover:text-[#C9A84C]'} flex items-center justify-center transition-colors`}>
+            <Icon className="w-5 h-5" />
+        </div>
+        <div>
+            <h4 className="text-lg font-bold text-white mb-1">{title}</h4>
+            <p className="text-zinc-500 text-xs leading-relaxed">{desc}</p>
+        </div>
+        <div className={`flex items-center gap-2 ${highlight ? 'text-[#C9A84C]' : 'text-zinc-600 group-hover:text-[#C9A84C]'} text-[10px] font-bold uppercase tracking-widest mt-auto transition-colors`}>
+            Acceder <ArrowLeft className="w-3 h-3 rotate-180" />
+        </div>
+    </Link>
+);
 
 function HomeScreen() {
     const { user } = React.useContext(AuthContext);
@@ -464,38 +493,48 @@ function HomeScreen() {
 
             {/* Quick Actions / Featured */}
             <section className="space-y-6">
-                <h3 className="text-2xl font-serif text-white">Tu Protocolo Hoy</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Link to="/protocolo-principal" className="bg-[#121214]/60 border border-white/5 p-8 rounded-3xl hover:border-[#C9A84C]/50 transition-all group relative overflow-hidden">
-                         <div className="absolute top-0 right-0 w-32 h-32 bg-[#C9A84C]/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-[#C9A84C]/10 transition-all"></div>
-                         <div className="flex flex-col gap-4 relative z-10">
-                            <div className="w-12 h-12 rounded-2xl bg-[#C9A84C]/10 flex items-center justify-center text-[#C9A84C]">
-                                <Music className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-white mb-1">Sesión Principal</h4>
-                                <p className="text-zinc-500 text-sm">Escucha la frecuencia regenerativa Da Vinci (7 min).</p>
-                            </div>
-                            <div className="flex items-center gap-2 text-[#C9A84C] text-xs font-bold uppercase tracking-widest mt-2">
-                                Iniciar ahora <ArrowLeft className="w-4 h-4 rotate-180" />
-                            </div>
-                         </div>
-                    </Link>
-                    
-                    <Link to="/bonus-1" className="bg-[#121214]/60 border border-white/5 p-8 rounded-3xl hover:border-[#C9A84C]/50 transition-all group relative overflow-hidden">
-                         <div className="flex flex-col gap-4 relative z-10">
-                            <div className="w-12 h-12 rounded-2xl bg-[#C9A84C]/10 flex items-center justify-center text-[#C9A84C]">
-                                <Brain className="w-6 h-6" />
-                            </div>
-                            <div>
-                                <h4 className="text-xl font-bold text-white mb-1">Niebla Mental</h4>
-                                <p className="text-zinc-500 text-sm">Protocolo matutino para claridad inmediata (3 min).</p>
-                            </div>
-                            <div className="flex items-center gap-2 text-[#C9A84C] text-xs font-bold uppercase tracking-widest mt-2">
-                                Visualizar <ArrowLeft className="w-4 h-4 rotate-180" />
-                            </div>
-                         </div>
-                    </Link>
+                <div className="flex items-center justify-between">
+                    <h3 className="text-2xl font-serif text-white">Todos los Módulos</h3>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <ModuleCard 
+                        to="/protocolo-principal" 
+                        icon={Music} 
+                        title="Sesión Principal" 
+                        desc="Frecuencia Da Vinci (7 min)" 
+                        highlight 
+                    />
+                    <ModuleCard 
+                        to="/reset-nervio" 
+                        icon={Activity} 
+                        title="Reset Nervio" 
+                        desc="Calibración auditiva básica" 
+                    />
+                    <ModuleCard 
+                        to="/reconstruccion-cognitiva" 
+                        icon={Lightbulb} 
+                        title="Reconstrucción" 
+                        desc="Protocolo neuro-regenerativo" 
+                    />
+                    <ModuleCard 
+                        to="/bonus-1" 
+                        icon={Brain} 
+                        title="Niebla Mental" 
+                        desc="Claridad inmediata" 
+                    />
+                    <ModuleCard 
+                        to="/bonus-2" 
+                        icon={Salad} 
+                        title="Guía Alimentos" 
+                        desc="Nutrición auditiva" 
+                    />
+                    <ModuleCard 
+                        to="/botin-digital" 
+                        icon={Gift} 
+                        title="Bonus Extras" 
+                        desc="Botín digital completo" 
+                    />
                 </div>
             </section>
         </motion.div>
@@ -580,7 +619,7 @@ function DashboardLayout({ children }) {
             </main>
 
             {/* Bottom Navigation for Mobile */}
-            <BottomNav />
+            <BottomNav onMenuClick={() => setMobileMenuOpen(true)} />
 
             {/* Mobile Menu Backdrop */}
             {mobileMenuOpen && (
